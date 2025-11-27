@@ -12,7 +12,7 @@ class DualSD {
     File teensySDFile;
     File externalSDFile;
 
-    char* teensyFileName;
+    char* teensySDFileName;
     char* externalSDFileName;
 
     int teensy_cspin;
@@ -61,8 +61,21 @@ class DualSD {
       // this->externalSDFileName = externalSDFileName;
       
       char* id = "00AA";
+
+      char* teensyFileName = "teensy_data_log";
+      strcat(teensyFileName, id);
+
+      char* externalFileName = "external_data_log";
+      strcat(externalFileName, id);
+
       // create file and have starter CSV line
-      if (SD.exists())
+      // checks to see if the files already exist
+      // if they do, we don't need to initialize
+      if ( (SD.exists(teensyFileName) && SD.exists(externalFileName)) ) { return -1; }
+
+      
+
+
       this->write(dataHeaders);
 
     };
@@ -74,7 +87,7 @@ class DualSD {
       digitalWrite(external_cspin, HIGH);
       digitalWrite(teensy_cspin, LOW);
 
-      teensySDFile = SD.open(teensyFileName, FILE_WRITE);
+      teensySDFile = SD.open(teensySDFileName, FILE_WRITE);
       teensySDFile.write(data);
       teensySDFile.close();
 
@@ -98,23 +111,21 @@ const DualSD SDManager;
 void setup() {
   // put your setup code here, to run once:
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
 
-  Serial.begin(19200);
+  // Serial.begin(19200);
 
-  Serial.println("Testing MicroSD");
+  // Serial.println("Testing MicroSD");
 
-  if (SD.begin(SD_CS_PIN)) {
+  // if (SD.begin(SD_CS_PIN)) {
 
-    Serial.println("MicroSD Extension working.");
+  //   Serial.println("MicroSD Extension working.");
 
-  } else {
+  // } else {
 
-    Serial.println("MicroSD Extension not working.");
+  //   Serial.println("MicroSD Extension not working.");
 
-  }
-
-
+  // }
 
 }
 
