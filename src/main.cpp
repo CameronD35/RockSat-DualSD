@@ -28,9 +28,6 @@ class DualSD {
       teensy_cspin = NULL;
       external_cspin = NULL;
 
-      this->teensyFileName = teensyFileName;
-      this->externalSDFileName = externalSDFileName;
-
     }
 
     int begin(int teensy_cspin, int external_cspin) {
@@ -48,54 +45,25 @@ class DualSD {
     
     };
 
-    // int open(char* teensyFileName, char* externalSDFileName) {
-
-
-    //   // if the cs pins are defined we know that SD.begin() has been called
-    //   if (teensy_cspin && external_cspin) {
-        
-    //     teensySDFile = SD.open(teensyFileName, FILE_WRITE);
-    //     externalSDFile = SD.open(externalSDFileName, FILE_WRITE);
-
-    //     if (teensySDFile && externalSDFile) { return 1; }
-
-    //     // indicates SD has begun but files could not be opened for writing
-    //     return 0;
-
-    //   }
-      
-    //   // indicates that SD.begin() has not been called
-    //   return -1;
-
-    // }
-
-    // int close() {
-
-    //   // if the cs pins are defined we know that SD.begin() has been called
-    //   if (teensy_cspin && external_cspin) {
-
-    //     teensySDFile.close();
-    //     externalSDFile.close();
-
-    //     return 1;
-
-    //   }
-
-    //   return -1;
-
-    // }
-
     int exists(char* filename) {
 
       SD.exists(filename);
 
     };
 
-    int initializeFiles() {
+    int initializeFiles(char* dataHeaders) {
 
-      // get current time
-      // format to something nice
+
+      // get last created file id
+      // (device)_data_log_(id)
+
+      // this->teensyFileName = teensyFileName;
+      // this->externalSDFileName = externalSDFileName;
+      
+      char* id = "00AA";
       // create file and have starter CSV line
+      if (SD.exists())
+      this->write(dataHeaders);
 
     };
 
