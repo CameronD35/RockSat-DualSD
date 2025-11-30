@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <DualSD.h>
+#include <string.h>
 
 DualSD::DualSD() {
   
@@ -8,6 +9,7 @@ DualSD::DualSD() {
   
 }
 
+// returns 1 if successful on both SD cards, otherwise returns -1
 int DualSD::begin(int teensy_cspin, int external_cspin) {
 
   if (SD.begin(teensy_cspin) && SD.begin(external_cspin)) {
@@ -23,7 +25,16 @@ int DualSD::begin(int teensy_cspin, int external_cspin) {
 
 }
 
+// returns 1 if a file exists on teensy or external, returns -1 if it doesn't exist
 int DualSD::exists(char* filename) {
+
+  digitalWrite(teensy_cspin, LOW);
+  digitalWrite(external_cspin, HIGH);
+
+  if (SD.exists(filename)) { return 1; }
+
+  digitalWrite(teensy_cspin, HIGH);
+  digitalWrite(external_cspin, LOW);
 
   if (SD.exists(filename)) { return 1; }
 
@@ -31,7 +42,9 @@ int DualSD::exists(char* filename) {
 
 };
 
-int DualSD::initializeFiles(char* dataHeaders) {
+// initializes files with ehaders (used for CSV)
+// returns 1 if successful, returns -1 if not
+int DualSD::initializeFiles(const char* dataHeaders) {
 
   const char* id = "00AAF";
 
@@ -56,7 +69,9 @@ int DualSD::initializeFiles(char* dataHeaders) {
 
 }
 
-int DualSD::write(char* data) {
+// writes data to both sd cards
+// returns 1 is successful
+int DualSD::write(String data) {
 
   // ensure teensy sd card is selected and external sd is not
   // https://forum.arduino.cc/t/two-sd-cards-on-the-same-project/1012605
@@ -64,7 +79,7 @@ int DualSD::write(char* data) {
   digitalWrite(external_cspin, HIGH);
   
   teensySDFile = SD.open(teensySDFileName, FILE_WRITE);
-  teensySDFile.write(data);
+  if (!(teensySDFile.println(data) != sizeof(data))) { return -1; } ;
   teensySDFile.close();
 
   // ensure external sd card is selected and teensy sd is not
@@ -72,7 +87,7 @@ int DualSD::write(char* data) {
   digitalWrite(external_cspin, LOW);
   
   externalSDFile = SD.open(externalSDFileName, FILE_WRITE);
-  externalSDFile.write(data);
+  if (!(externalSDFile.println(data) != sizeof(data))) { return -1; };
   externalSDFile.close();
 
   return 1;

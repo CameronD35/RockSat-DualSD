@@ -24,9 +24,9 @@ class DualSD {
 
         int exists(char* filename);
 
-        int initializeFiles(char* dataHeaders);
+        int initializeFiles(const char* dataHeaders);
 
-        int write(char* data);
+        int write(String data);
 
         int read(char* teensyOutput, char* extOutput);
 
