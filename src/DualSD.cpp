@@ -45,23 +45,20 @@ int DualSD::exists(char* filename) {
 // initializes files with ehaders (used for CSV)
 // returns 1 if successful, returns -1 if not
 int DualSD::initializeFiles(const char* dataHeaders) {
+  
+  unsigned short id = this->generateNewFileID();
 
-  const char* id = "00AAF";
+  // 19 and 18 are exactly enough to fit the filename
+  String teensyFileName;
+  String externalFileName;
 
-  // 19 and 18 are exactly enough to fit the file
-  char teensyFileName[19];
-  char externalFileName[18];
-
-  strcpy(teensyFileName, "tnsy_data_log");
-  strcpy(externalFileName, "ext_data_log");
-
-  strcat(teensyFileName, id);
-  strcat(externalFileName, id);
+  teensyFileName = "tnsy_data_log_" + id;
+  externalFileName = "ext_data_log_" + id;
 
   // create file and have starter CSV line
   // checks to see if the files already exist
   // if they do, we don't need to initialize
-  if ( (SD.exists(teensyFileName) && SD.exists(externalFileName)) ) { return -1; }      
+  if ( (SD.exists(teensyFileName.c_str()) && SD.exists(externalFileName.c_str())) ) { return -1; }
       
   this->write(dataHeaders);
 
@@ -78,7 +75,7 @@ int DualSD::write(String data) {
   digitalWrite(teensy_cspin, LOW);
   digitalWrite(external_cspin, HIGH);
   
-  teensySDFile = SD.open(teensySDFileName, FILE_WRITE);
+  teensySDFile = SD.open(teensySDFileName.c_str(), FILE_WRITE);
   if (!(teensySDFile.println(data) != sizeof(data))) { return -1; } ;
   teensySDFile.close();
 
@@ -86,7 +83,7 @@ int DualSD::write(String data) {
   digitalWrite(teensy_cspin, HIGH);
   digitalWrite(external_cspin, LOW);
   
-  externalSDFile = SD.open(externalSDFileName, FILE_WRITE);
+  externalSDFile = SD.open(externalSDFileName.c_str(), FILE_WRITE);
   if (!(externalSDFile.println(data) != sizeof(data))) { return -1; };
   externalSDFile.close();
 
@@ -104,5 +101,42 @@ int DualSD::read(char* teensyOutput, char* extOutput) {
   *extOutput = externalSDFile.read();
   
   return 1;
+
+}
+
+unsigned short DualSD::generateNewFileID() {
+
+  // add code to make id iterate every time a file is created
+  // get the last id created in the filesystem
+
+  File root = SD.open("/");
+
+  if (!root.isDirectory()) { Serial.println("Somehow this ain't a directory bruh."); return 0; }
+
+  // int id;
+
+  // while (true) {
+
+  //   File entry = root.openNextFile();
+
+  //   if (!entry) { break; }
+
+  //   id++;
+
+  //   entry.close();
+
+  // }
+
+  unsigned short fileCount = 1;
+
+  File currFile;
+
+  for (currFile = root.openNextFile(); currFile != NULL; currFile = root.openNextFile()) {
+
+    fileCount++;
+
+  }
+
+  return fileCount;
 
 }

@@ -10,8 +10,8 @@ class DualSD {
         File teensySDFile;
         File externalSDFile;
 
-        char* teensySDFileName;
-        char* externalSDFileName;
+        String teensySDFileName;
+        String externalSDFileName;
 
         int teensy_cspin;
         int external_cspin;
@@ -29,6 +29,8 @@ class DualSD {
         int write(String data);
 
         int read(char* teensyOutput, char* extOutput);
+
+        unsigned short generateNewFileID();
 
 
 };
